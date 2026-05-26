@@ -14,6 +14,7 @@ import static org.eclipse.hawkbit.mgmt.rest.api.MgmtRestConstants.REQUEST_PARAME
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -146,8 +147,11 @@ public final class MgmtRolloutMapper {
     }
 
     public static Create fromRetriedRollout(final Rollout rollout) {
+        // Rollout name is unique per tenant; hawkBit default "name_retry" collides on second retry — use a time suffix.
+        final String retriedName =
+                rollout.getName().concat("_retry_").concat(String.valueOf(Instant.now().toEpochMilli()));
         return Create.builder()
-                .name(rollout.getName().concat("_retry"))
+                .name(retriedName)
                 .description(rollout.getDescription())
                 .distributionSet(rollout.getDistributionSet())
                 .targetFilterQuery("failedrollout==".concat(String.valueOf(rollout.getId())))

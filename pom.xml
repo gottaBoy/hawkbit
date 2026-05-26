@@ -83,6 +83,8 @@
         <rabbitmq.http-client.version>5.4.0</rabbitmq.http-client.version>
         <classgraph.version>4.8.184</classgraph.version>
         <awaitility.version>4.3.0</awaitility.version>
+        <!-- Used by spring-cloud-function JsonMapper (JodaModule); keep explicit for JDK / nested-jar stability -->
+        <joda-time.version>2.14.1</joda-time.version>
         <!-- Misc libraries versions - END -->
 
         <!-- Maven Plugin versions - START -->
@@ -321,6 +323,11 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-collections4</artifactId>
                 <version>${commons-collections4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>${joda-time.version}</version>
             </dependency>
 
             <!-- Test -->
