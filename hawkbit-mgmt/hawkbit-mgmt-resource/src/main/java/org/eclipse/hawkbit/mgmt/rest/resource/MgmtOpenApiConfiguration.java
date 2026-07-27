@@ -47,7 +47,7 @@ public class MgmtOpenApiConfiguration {
                                         .title("Management API")
                                         .version("v1")
                                         .description("""
-                                                The Management API provides access to the management features of the hawkBit.
+                                                The Management API provides access to the management features of the ZOTA.
                                                 It allows for managing devices, deployments, and other.
                                                 """))
                                 .servers(tenantEndpointEnabled

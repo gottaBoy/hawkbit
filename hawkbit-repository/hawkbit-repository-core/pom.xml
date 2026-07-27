@@ -46,5 +46,10 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
         </dependency>
+        <!-- Spring Cloud Function JsonMapper always registers JodaModule (see ContextFunctionCatalogAutoConfiguration) -->
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+        </dependency>
     </dependencies>
 </project>

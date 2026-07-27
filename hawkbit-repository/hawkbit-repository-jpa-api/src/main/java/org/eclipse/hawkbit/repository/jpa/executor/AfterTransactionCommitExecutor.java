@@ -11,6 +11,10 @@ package org.eclipse.hawkbit.repository.jpa.executor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -25,7 +29,22 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 @Slf4j
 public class AfterTransactionCommitExecutor {
 
-    // Exception squid:S1217 - we want to run this synchronous
+    /**
+     * Shared thread pool for executing after-commit runnables asynchronously.
+     * Using a separate pool prevents slow/blocking runnables (e.g. RabbitMQ event publishing)
+     * from delaying the HTTP response to the client.
+     */
+    private static final ExecutorService EXECUTOR = Executors.newCachedThreadPool(new ThreadFactory() {
+        private final AtomicInteger counter = new AtomicInteger(0);
+
+        @Override
+        public Thread newThread(final Runnable r) {
+            final Thread t = new Thread(r, "after-commit-" + counter.incrementAndGet());
+            t.setDaemon(true);
+            return t;
+        }
+    });
+
     @SuppressWarnings("squid:S1217")
     public static void afterCommit(final Runnable runnable) {
         log.debug("Submitting new runnable {} to run after transaction commit", runnable);
@@ -50,14 +69,16 @@ public class AfterTransactionCommitExecutor {
         // Exception squid:S1217 - Is aspectJ proxy
         @SuppressWarnings({ "squid:S1217" })
         public void afterCommit() {
-            log.debug("Transaction successfully committed, executing {} runnables", afterCommitRunnables.size());
+            log.debug("Transaction successfully committed, submitting {} runnables to async executor", afterCommitRunnables.size());
             for (final Runnable afterCommitRunnable : afterCommitRunnables) {
-                log.debug("Executing runnable {}", afterCommitRunnable);
-                try {
-                    afterCommitRunnable.run();
-                } catch (final RuntimeException e) {
-                    log.error("Failed to execute runnable {}", afterCommitRunnable, e);
-                }
+                log.debug("Submitting runnable {} to async executor", afterCommitRunnable);
+                EXECUTOR.execute(() -> {
+                    try {
+                        afterCommitRunnable.run();
+                    } catch (final RuntimeException e) {
+                        log.error("Failed to execute runnable {}", afterCommitRunnable, e);
+                    }
+                });
             }
         }
 

@@ -50,6 +50,7 @@ import org.eclipse.hawkbit.tenancy.configuration.PollingTime.PollingInterval;
 import org.eclipse.hawkbit.tenancy.configuration.TenantConfigurationProperties;
 import org.eclipse.hawkbit.tenancy.configuration.TenantConfigurationProperties.TenantConfigurationKey;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
+import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -72,7 +73,7 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @Service
 @ConditionalOnBooleanProperty(prefix = "hawkbit.jpa", name = { "enabled", "tenant-configuration-management" }, matchIfMissing = true)
-public class JpaTenantConfigurationManagement implements TenantConfigurationManagement, ApplicationListener<ContextRefreshedEvent> {
+public class JpaTenantConfigurationManagement implements TenantConfigurationManagement, ApplicationListener<ContextRefreshedEvent>, SmartInitializingSingleton {
 
     private static final String CACHE_TENANT_CONFIGURATION_NAME = JpaTenantConfiguration.class.getSimpleName();
     private static final ConfigurableConversionService CONVERSION_SERVICE = new DefaultConversionService();
@@ -93,6 +94,12 @@ public class JpaTenantConfigurationManagement implements TenantConfigurationMana
     @Override
     public void onApplicationEvent(@NonNull final ContextRefreshedEvent event) {
         // Sets the proxy / bean from the context in order to be used via proxy and onore things like @PreAuthorize and @Transactional
+        TenantConfigHelper.setTenantConfigurationManagement(applicationContext.getBean(JpaTenantConfigurationManagement.class));
+    }
+
+    @Override
+    public void afterSingletonsInstantiated() {
+        // Fallback: ensure static helper is set even if ContextRefreshedEvent was missed
         TenantConfigHelper.setTenantConfigurationManagement(applicationContext.getBean(JpaTenantConfigurationManagement.class));
     }
 

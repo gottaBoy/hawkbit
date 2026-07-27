@@ -79,6 +79,8 @@
         <io-protostuff.version>1.8.0</io-protostuff.version>
         <!-- Spring AI for MCP support -->
         <spring-ai.version>1.1.2</spring-ai.version>
+        <!-- AWS S3 SDK for TOS/MinIO artifact storage -->
+        <awssdk.version>2.27.21</awssdk.version>
         <!-- test -->
         <rabbitmq.http-client.version>5.4.0</rabbitmq.http-client.version>
         <classgraph.version>4.8.184</classgraph.version>
@@ -256,6 +258,14 @@
                 <groupId>org.springframework.ai</groupId>
                 <artifactId>spring-ai-bom</artifactId>
                 <version>${spring-ai.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- AWS S3 SDK BOM -->
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
+                <version>${awssdk.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

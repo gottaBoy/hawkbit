@@ -1,0 +1,37 @@
+# Local monolith image: copies a pre-built jar from the repo (no Maven Central download).
+# Build context: hawkbit repo root (this file's parent's parent).
+#
+#   mvn -pl hawkbit-monolith/hawkbit-update-server -am package -DskipTests
+#   docker build -f docker/build/Dockerfile.local-jar -t hawkbit/zota-local:latest .
+#
+ARG JAVA_VERSION=21.0.10_7
+FROM eclipse-temurin:${JAVA_VERSION}-jre-alpine
+
+ARG APP_DIR=/app
+WORKDIR ${APP_DIR}
+
+RUN addgroup -S hawkbit_group && adduser -D hawkbit -G hawkbit_group \
+  && mkdir -p artifactrepo && chown -R hawkbit artifactrepo
+
+ARG JAR_PATH=hawkbit-monolith/hawkbit-update-server/target/hawkbit-update-server-0-SNAPSHOT.jar
+COPY ${JAR_PATH} /app/server.jar
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+
+RUN chmod +x /app/docker-entrypoint.sh \
+  && chown hawkbit:hawkbit_group /app/server.jar /app/docker-entrypoint.sh
+
+USER hawkbit
+
+ENV HAWKBIT_JAR=/app/server.jar
+
+ARG CONTAINER_PORT=8080
+EXPOSE ${CONTAINER_PORT}
+
+ARG PROFILES=h2
+ENV PROFILES=${PROFILES}
+ARG X_MS=768m
+ENV X_MS=${X_MS}
+ARG X_MX=768m
+ENV X_MX=${X_MX}
+
+ENTRYPOINT ["/app/docker-entrypoint.sh"]

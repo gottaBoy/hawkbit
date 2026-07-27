@@ -22,7 +22,7 @@ public class OpenApi {
 
     public static final String HAWKBIT_SERVER_OPENAPI_ENABLED = "hawkbit.server.openapi.enabled";
 
-    public static final String X_HAWKBIT = "x-hawkbit";
+    public static final String X_HAWKBIT = "x-zota";
     public static final String ORDER = "order";
 
     public static List<Tag> sort(final List<Tag> tags) {

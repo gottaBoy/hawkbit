@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: zota-server
+  namespace: zota
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "2g"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - zota-ddi.intra.zeron.ai
+        - zota-mgmt.intra.zeron.ai
+      secretName: zota-server-tls
+  rules:
+    - host: zota-ddi.intra.zeron.ai
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service: { name: zota-server, port: { number: 8090 } }
+    - host: zota-mgmt.intra.zeron.ai
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service: { name: zota-server, port: { number: 8090 } }

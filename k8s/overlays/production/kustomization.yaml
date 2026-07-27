@@ -1,0 +1,21 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: zota
+
+resources:
+  - ../../base
+  - ingress.yaml
+
+images:
+  - name: zota-server
+    newName: harbor.intra.zeron.ai/smartdrive/zota-server
+    newTag: latest
+
+patches:
+  - target:
+      kind: Deployment
+      name: zota-server
+    patch: |
+      - op: replace
+        path: /spec/replicas
+        value: 3

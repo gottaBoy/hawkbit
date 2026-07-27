@@ -1,1 +1,2 @@
 org.eclipse.hawkbit.autoconfigure.artifact.fs.FileArtifactStorageConfiguration
+org.eclipse.hawkbit.autoconfigure.artifact.S3ArtifactStorageConfiguration
