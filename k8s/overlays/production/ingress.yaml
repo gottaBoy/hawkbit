@@ -4,29 +4,61 @@ metadata:
   name: zota-server
   namespace: zota
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: vault-fleet-issuer
+    ingress.vke.volcengine.com/apig-instance-name: apig-dwrfhpnpp2q6
+    ingress.vke.volcengine.com/loadbalancer-healthcheck-enabled: "true"
+    ingress.vke.volcengine.com/loadbalancer-healthcheck-httpcode: http_2xx,http_3xx
+    ingress.vke.volcengine.com/loadbalancer-healthcheck-interval: "2"
+    ingress.vke.volcengine.com/loadbalancer-healthcheck-method: GET
+    ingress.vke.volcengine.com/loadbalancer-healthcheck-path: /actuator/health
+    ingress.vke.volcengine.com/loadbalancer-healthcheck-protocol: http
+    ingress.vke.volcengine.com/loadbalancer-healthcheck-timeout: "2"
+    ingress.vke.volcengine.com/loadbalancer-healthy-threshold: "3"
+    ingress.vke.volcengine.com/loadbalancer-id: gd8gntdv2e21p618kbgvg
+    ingress.vke.volcengine.com/loadbalancer-pass-through: "false"
+    ingress.vke.volcengine.com/loadbalancer-port: "443"
+    ingress.vke.volcengine.com/loadbalancer-protocol: https
+    ingress.vke.volcengine.com/loadbalancer-scheduler: round_robin
+    ingress.vke.volcengine.com/loadbalancer-unhealthy-threshold: "3"
     nginx.ingress.kubernetes.io/proxy-body-size: "2g"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    vke.volcengine.com/description: ""
 spec:
-  ingressClassName: nginx
+  ingressClassName: apig
   tls:
     - hosts:
+        - zota.intra.zeron.ai
         - zota-ddi.intra.zeron.ai
         - zota-mgmt.intra.zeron.ai
       secretName: zota-server-tls
   rules:
+    - host: zota.intra.zeron.ai
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: zota-server
+                port:
+                  number: 8090
     - host: zota-ddi.intra.zeron.ai
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
-              service: { name: zota-server, port: { number: 8090 } }
+              service:
+                name: zota-server
+                port:
+                  number: 8090
     - host: zota-mgmt.intra.zeron.ai
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
-              service: { name: zota-server, port: { number: 8090 } }
+              service:
+                name: zota-server
+                port:
+                  number: 8090

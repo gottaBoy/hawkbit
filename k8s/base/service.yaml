@@ -14,15 +14,3 @@ spec:
       name: http
   selector:
     app: zota-server
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: zota-server-artifacts
-  namespace: zota
-spec:
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 100Gi

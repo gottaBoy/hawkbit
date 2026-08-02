@@ -7,7 +7,7 @@ metadata:
     app: zota-server
     component: ota-core
 spec:
-  replicas: 2
+  replicas: 1
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -43,40 +43,35 @@ spec:
           envFrom:
             - configMapRef:
                 name: zota-server-config
-            - secretRef:
-                name: zota-server-secrets
-          env:
-            - name: SPRING_DATASOURCE_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: zota-server-secrets
-                  key: db-username
-            - name: SPRING_DATASOURCE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: zota-server-secrets
-                  key: db-password
-            - name: SPRING_RABBITMQ_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: zota-server-secrets
-                  key: rabbitmq-username
-            - name: SPRING_RABBITMQ_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: zota-server-secrets
-                  key: rabbitmq-password
-            - name: HAWKBIT_SERVER_DDI_SECURITY_AUTHENTICATION_GATEWAYTOKEN_KEY
-              valueFrom:ver
-                secretKeyRef:
-                  name: zota-all-secrets
-                  key: gateway-token
+          env: []
           livenessProbe:
             httpGet:
               path: /actuator/health
               port: 8090
-            initialDelaySeconds: 60
-            periodSeconds: 
+            initialDelaySeconds: 0
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8090
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8090
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 30
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1536Mi
             limits:
               cpu: 2000m
               memory: 2Gi
@@ -86,24 +81,6 @@ spec:
             runAsUser: 1000
             capabilities:
               drop:
-                - ALL30
-          readinessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8090
-            initialDelaySeconds: 30
-            periodSeconds: 15
-          resources:
-            requests:
-              cpu: 500m
-              memory: 512Mi
-            limits:
-              cpu: 2000m
-              memory: 2048Mi
-          volumeMounts:
-            - name: artifact-store
-              mountPath: /var/lib/hawkbit/artifacts
-      volumes:
-        - name: artifact-store
-          persistentVolumeClaim:
-            claimName: zota-server-artifacts
+                - ALL
+      volumes: []
+

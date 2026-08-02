@@ -5,10 +5,8 @@ metadata:
   namespace: zota
 data:
   SPRING_PROFILES_ACTIVE: "postgresql"
-  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres.zota.svc:5432/zota_server"
-  SPRING_RABBITMQ_HOST: "rabbitmq.zota.svc"
-  SPRING_RABBITMQ_PORT: "5672"
   HAWKBIT_SERVER_DDI_SECURITY_AUTHENTICATION_TARGETTOKEN_ENABLED: "true"
   HAWKBIT_SERVER_DDI_SECURITY_AUTHENTICATION_GATEWAYTOKEN_ENABLED: "true"
   HAWKBIT_SERVER_REPOSITORY_PUBLISH_TARGET_POLL_EVENT: "false"
-  JAVA_OPTS: "-Xms512m -Xmx1024m"
+  JAVA_OPTS: "-Xms512m -Xmx1024m -XX:MaxMetaspaceSize=256m -XX:MaxDirectMemorySize=128m -XX:ReservedCodeCacheSize=128m"
+  CORS_ORIGINS: "http://zota-web.intra.zeron.ai,https://zota-repo-web.intra.zeron.ai,http://localhost:3000,http://localhost:5173"

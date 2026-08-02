@@ -6,7 +6,7 @@ resources:
   - configmap.yaml
   - deployment.yaml
   - service.yaml
-  - pvc.yaml
+  - hpa.yaml
 
 images:
   - name: zota-server
